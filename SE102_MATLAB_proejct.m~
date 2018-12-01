@@ -63,14 +63,12 @@ column_border = column_border';
 %Since we marked the borders with relative order, problem occurs when new
 %border is calculated, since the computer cannot distinguish between
 %existing nth border and new nth border. So we manually distinguish them by
-%calculating the difference; if there are countable difference, then they
-%must be different borders.
+%calculating the difference; if there
 for i=1:size(row_border, 1)
-    temp = size(row_border, 2); %Now we count backwards, since it's a lot easier
+    temp = size(row_border, 2);
     for j=size(row_border, 2):-1:2
         if (abs(row_border(i, j)-row_border(i, j-1))>2)
-            row_border = [row_border ; zeros(1, size(row_border, 2))]; %We make
-            %new row and save it there
+            row_border = [row_border ; zeros(1, size(row_border, 2))];
             row_border(end, j:temp) = row_border(i, j:temp);
             row_border(i, j:temp) = zeros(1, temp-j+1);
             temp = j-1;
@@ -78,7 +76,6 @@ for i=1:size(row_border, 1)
     end
 end
 
-%Same logic, now for columns
 for i=1:size(column_border, 1)
     temp = size(column_border, 2);
     for j=size(column_border, 2):-1:2
@@ -91,13 +88,9 @@ for i=1:size(column_border, 1)
     end
 end
 
-%show original image
 image(A)
 hold on;
-
-%Now we plot the graph
 for i=1:size(row_border, 1)
-    %We make sure x and y values coincide
     x = 1:size(A_BW, 1);
     row_border_new = row_border(i, :);
     x(length(row_border_new)+1:end) = [];
@@ -105,13 +98,10 @@ for i=1:size(row_border, 1)
     row_border_new(zero_in_row) = [];
     x(zero_in_row) = [];
     
-    %We ignore matrixes that has only one value; we can't plot it & it 
-    %doesn't matter anyway.
     if(length(row_border_new) > 2)
         xq = x(1):0.25:x(end);
-    y = spline(x, row_border_new, xq); %we use spline to interpolate between
-    %points, pchip can be alternatively used (Google it)
-    plot(xq, y, 'Linewidth', 5)
+    y = spline(x, row_border_new, xq);
+    plot(xq, y, 'o')
     end
 end
 
@@ -129,12 +119,7 @@ for i=1:size(column_border, 1)
     
     xq = x(1):0.25:x(end);
     y = spline(x, column_border_new, xq);
-    plot(y, xq, 'Linewidth', 5)
+    plot(y, xq, 'o')
     axis([0 size(A, 1) 0 size(A, 2)])
 end 
 hold off;
-
-%Now what? we have to:
-%1. Find a way to "smartly" distinguish between row and column border
-%search
-%2. Find a way to use this result.
