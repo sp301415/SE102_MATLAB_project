@@ -1,64 +1,55 @@
-A = imread('test.jpg');
-
-A_BW = A;
+A = imread('test8.jpg');
+A_BW = A(:, : , 1);
 
 % Change original image to Black and White image
-for i=1:size(A)
-    for j=1:size(A)
-        if (A(i, j, :) < 200)
-            A_BW(i, j, :) = 0;
+for i=1:size(A,1)
+    for j=1:size(A,2)
+        if (A_BW(i, j) < 200)
+            A_BW(i, j) = 0;
+        else
+            A_BW(i, j) = 255;
         end
     end
 end
 
-%Now we are dealing with only 1 value of RGB, since every value is either 0 or 255
-A_BW = A_BW(:,:,1);
-
 %Finding borders in Row direction
 %Intialize
-x = 1:size(A_BW, 1);
 row_border = 0;
-for i=1:length(x) 
-    row_border_search = find(A_BW(:,i)==0); %Find the black lines
+for i=1:size(A_BW, 1)
+    row_border_search = find(A_BW(i, :) == 0); %Find the black lines
     borders = 0; %borders represent how much distinct lines exist
     temp = 1; %temp marks the start of new border
-    for j=1:length(row_border_search)-1
+    for j=2: length(row_border_search)-1
         if (row_border_search(j+1) - row_border_search(j) > 1)
             borders = borders+1; %count borders since we found disctinct line
-            
-            row_border(i, borders) = mean(row_border_search(temp:j)); %calculate 
+            row_border(borders, i) = mean(row_border_search(temp:j)); %calculate 
             %the mean value of the line 
             temp = j+1; %set new temp
         end
     end
     if (isempty(row_border_search)==0) %By above logic, 
         %we cannot calculate the "last" border; so we do it manually.
-        row_border(i, borders+1) = mean(row_border_search(temp:j));
+        row_border(borders+1, i) = mean(row_border_search(temp:end));
     end
 end
 
 %Finding borders(again with columns, same logic)
-x = 1:size(A_BW, 1);
 column_border = 0;
-for i=1:length(x)
-    column_border_search = find(A_BW(i,:)==0);
+for i=1:size(A_BW, 2)
+    column_border_search = find(A_BW(:,i)==0);
     borders = 0;
     temp = 1;
     for j=1:length(column_border_search)-1
         if (column_border_search(j+1) - column_border_search(j) > 1)
             borders = borders+1;
-            column_border(i, borders) = mean(column_border_search(temp:j));
+            column_border(borders, i) = mean(column_border_search(temp:j));
             temp = j+1;
         end
     end
     if (isempty(column_border_search)==0)
-        column_border(i, borders+1) = mean(column_border_search(temp:j));
+        column_border(borders+1, i) = mean(column_border_search(temp:end));
     end
 end
-
-%Transpose the matrix, because we can :)
-row_border = row_border'; 
-column_border = column_border';
 
 %Since we marked the borders with relative order, problem occurs when new
 %border is calculated, since the computer cannot distinguish between
@@ -108,29 +99,31 @@ for i=1:size(row_border, 1)
     %We ignore matrixes that has only one value; we can't plot it & it 
     %doesn't matter anyway.
     if(length(row_border_new) > 2)
-        xq = x(1):0.25:x(end);
-    y = spline(x, row_border_new, xq); %we use spline to interpolate between
+        xq = x(1):0.1:x(end);
+        y = spline(x, row_border_new, xq); %we use spline to interpolate between
     %points, pchip can be alternatively used (Google it)
-    plot(xq, y, 'Linewidth', 5)
+        plot(row_border_new,x, 'Linewidth', 3, 'Color', 'r')
+    else
+        plot(row_border_new,x,'Linewidth', 3, 'Color', 'r')
     end
 end
 
 for i=1:size(column_border, 1) 
-    x = 1:size(A_BW, 1);
+    x = 1:size(A_BW, 2);
     column_border_new = column_border(i, :);
     x(length(column_border_new)+1:end) = [];
     zero_in_column = find(column_border_new == 0);
     column_border_new(zero_in_column) = [];
     x(zero_in_column) = [];
     
-    if(length(column_border_new) < 2)
-        continue;
+    if(length(column_border_new) > 2)
+        xq = x(1):0.1:x(end);
+        y = spline(x, column_border_new, xq);
+        plot(x, column_border_new, 'Linewidth', 3, 'Color', 'r')
+    else
+        plot(x, column_border_new, 'Linewidth', 3, 'Color', 'r')
     end
-    
-    xq = x(1):0.25:x(end);
-    y = spline(x, column_border_new, xq);
-    plot(y, xq, 'Linewidth', 5)
-    axis([0 size(A, 1) 0 size(A, 2)])
+    axis([0 size(A_BW, 1) 0 size(A_BW, 2)])
 end 
 hold off;
 
