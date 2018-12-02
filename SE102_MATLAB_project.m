@@ -1,4 +1,4 @@
-A = imread('test8.jpg');
+A = imread('test5.png');
 A_BW = A(:, : , 1);
 
 % Change original image to Black and White image
@@ -19,7 +19,10 @@ for i=1:size(A_BW, 1)
     row_border_search = find(A_BW(i, :) == 0); %Find the black lines
     borders = 0; %borders represent how much distinct lines exist
     temp = 1; %temp marks the start of new border
-    for j=2: length(row_border_search)-1
+    if (length(row_border_search)==1)
+        row_border(borders+1, i) = row_border_search;
+    end
+    for j=1: length(row_border_search)-1
         if (row_border_search(j+1) - row_border_search(j) > 1)
             borders = borders+1; %count borders since we found disctinct line
             row_border(borders, i) = mean(row_border_search(temp:j)); %calculate 
@@ -39,6 +42,9 @@ for i=1:size(A_BW, 2)
     column_border_search = find(A_BW(:,i)==0);
     borders = 0;
     temp = 1;
+    if (length(column_border_search)==1)
+        column_border(borders+1, i) = column_border_search;
+    end
     for j=1:length(column_border_search)-1
         if (column_border_search(j+1) - column_border_search(j) > 1)
             borders = borders+1;
@@ -98,13 +104,13 @@ for i=1:size(row_border, 1)
     
     %We ignore matrixes that has only one value; we can't plot it & it 
     %doesn't matter anyway.
-    if(length(row_border_new) > 2)
+    if(length(row_border_new) > 1)
         xq = x(1):0.1:x(end);
         y = spline(x, row_border_new, xq); %we use spline to interpolate between
     %points, pchip can be alternatively used (Google it)
-        plot(row_border_new,x, 'Linewidth', 3, 'Color', 'r')
+        plot(y, xq, 'Linewidth', 3, 'Color', 'r')
     else
-        plot(row_border_new,x,'Linewidth', 3, 'Color', 'r')
+        %plot(row_border_new,x,'.', 'Color', 'r')
     end
 end
 
@@ -119,9 +125,9 @@ for i=1:size(column_border, 1)
     if(length(column_border_new) > 2)
         xq = x(1):0.1:x(end);
         y = spline(x, column_border_new, xq);
-        plot(x, column_border_new, 'Linewidth', 3, 'Color', 'r')
+        plot(xq, y, 'Linewidth', 3, 'Color', 'r')
     else
-        plot(x, column_border_new, 'Linewidth', 3, 'Color', 'r')
+        %plot(x, column_border_new, '.', 'Color', 'r')
     end
     axis([0 size(A_BW, 1) 0 size(A_BW, 2)])
 end 
