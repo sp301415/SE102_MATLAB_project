@@ -1,5 +1,6 @@
 A = imread('test5.png');
 A_BW = A(:, : , 1);
+A = A(:, :, 1:3);
 
 % Change original image to Black and White image
 for i=1:size(A,1)
@@ -108,7 +109,7 @@ for i=1:size(row_border, 1)
         xq = x(1):0.1:x(end);
         y = spline(x, row_border_new, xq); %we use spline to interpolate between
     %points, pchip can be alternatively used (Google it)
-        plot(y, xq, 'Linewidth', 3, 'Color', 'r')
+        plot(y, xq, 'Linewidth', 5, 'Color', 'r')
     else
         %plot(row_border_new,x,'.', 'Color', 'r')
     end
@@ -125,11 +126,11 @@ for i=1:size(column_border, 1)
     if(length(column_border_new) > 2)
         xq = x(1):0.1:x(end);
         y = spline(x, column_border_new, xq);
-        plot(xq, y, 'Linewidth', 3, 'Color', 'r')
+        plot(xq, y, 'Linewidth', 5, 'Color', 'r')
     else
         %plot(x, column_border_new, '.', 'Color', 'r')
     end
-    axis([0 size(A_BW, 1) 0 size(A_BW, 2)])
+    axis([0 size(A_BW, 2) 0 size(A_BW, 1)])
 end 
 hold off;
 
