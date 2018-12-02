@@ -123,7 +123,7 @@ for i=1:size(column_border, 1)
     column_border_new(zero_in_column) = [];
     x(zero_in_column) = [];
     
-    if(length(column_border_new) > 2)
+    if(length(column_border_new) > 1)
         xq = x(1):0.1:x(end);
         y = spline(x, column_border_new, xq);
         plot(xq, y, 'Linewidth', 5, 'Color', 'r')
